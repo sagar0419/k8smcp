@@ -11,17 +11,21 @@ import (
 	structvalues "github.com/sagar0419/k8smcp/structValues"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/rest"
 )
 
+// Pods Logs
 func (s *Server) PodLogs(ctx context.Context, req *mcp.CallToolRequest, in structvalues.LogsPodinput) (*mcp.CallToolResult, structvalues.PodLogsOutput, error) {
 	if in.Namespace == "" {
 		return nil, structvalues.PodLogsOutput{}, fmt.Errorf("namespace is required")
 	}
 	if in.PodName == "" {
-		return nil, structvalues.PodLogsOutput{}, fmt.Errorf("PodName is required to fetch logs")
+		if in.LabelSelector == "" {
+			return nil, structvalues.PodLogsOutput{}, fmt.Errorf("Either PodName or LabelSelector is required to fetch the logs")
+		}
 	}
 
-	log.Printf("k8s_pod_logs ns=%q pod=%q container=%q follow=%v tail=%v", in.Namespace, in.PodName, in.Container, in.Follow, in.TailLines)
+	log.Printf("k8s_pod_logs ns=%q pod=%q label=%q container=%q follow=%v tail=%v", in.Namespace, in.PodName, in.LabelSelector, in.Container, in.Follow, in.TailLines)
 
 	opts := &corev1.PodLogOptions{
 		Container:  in.Container,
@@ -45,17 +49,21 @@ func (s *Server) PodLogs(ctx context.Context, req *mcp.CallToolRequest, in struc
 			opts.LimitBytes = &limit
 		}
 	}
-
 	if in.SinceSeconds != nil {
 		opts.SinceSeconds = in.SinceSeconds
 	}
 	if in.SinceTime != nil {
-
 		mt := metav1.NewTime(*in.SinceTime)
 		opts.SinceTime = &mt
 	}
-	reqObj := s.k8s.CoreV1().Pods(in.Namespace).GetLogs(in.PodName, opts)
 
+	var reqObj *rest.Request
+
+	if in.PodName != "" {
+		reqObj = s.k8s.CoreV1().Pods(in.Namespace).GetLogs(in.PodName, opts)
+	} else {
+		reqObj = s.k8s.CoreV1().Pods(in.Namespace).GetLogs(in.LabelSelector, opts)
+	}
 	stream, err := reqObj.Stream(ctx)
 	if err != nil {
 		return nil, structvalues.PodLogsOutput{}, fmt.Errorf("stream logs: %w", err)

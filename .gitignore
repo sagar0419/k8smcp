@@ -1,4 +1,2 @@
-.gitignore
 1mcp-k8s
-mcp-k8s
-mcp-k8s-new
+mcp-k8s*
