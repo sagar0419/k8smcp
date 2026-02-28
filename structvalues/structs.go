@@ -27,15 +27,15 @@ type ListPodsOutput struct {
 type LogsPodinput struct {
 	Namespace     string     `json:"namespace" jsonschema:"required,Namespace to list pods from"`
 	LabelSelector string     `json:"labelSelector,omitempty" jsonschema:"Optional Kubernetes label selector, e.g. app=nginx"`
-	PodName       string     `json:"podname" jsonschema:"omitempty,podname to get pod logs"`
-	Container     string     `json:"container" jsonschema:"omitempty,Name of container to get logs"`
-	TailLines     *int64     `json:"taillines" jsonschema:"omitempty,only bring the last N lines (avoid carrying the whole history)"`
-	SinceSeconds  *int64     `json:"sinceseconds" jsonschema:"omitempty,bring logs newer than this duration"`
-	SinceTime     *time.Time `json:"sincetime" jsonschema:"omitempty,bring logs newer than this time"`
-	LimitBytes    *int64     `json:"limitbytes" jsonschema:"omitempty,do not bring more than N bytes (size cap)"`
-	Previous      bool       `json:"previous" jsonschema:"omitempty,bring logs from the previous instance of the container (useful after a crash/restart)"`
-	Follow        bool       `json:"follow" jsonschema:"omitempty,keep bringing new pages as they are being written (like kubectl logs -f)"`
-	Timestamps    bool       `json:"timestamps" jsonschema:"omitempty,include a timestamp at the start of each line"`
+	PodName       string     `json:"podname,omitempty" jsonschema:"podname to get pod logs"`
+	Container     string     `json:"container,omitempty" jsonschema:"Name of container to get logs"`
+	TailLines     *int64     `json:"taillines,omitempty" jsonschema:"only bring the last N lines (avoid carrying the whole history)"`
+	SinceSeconds  *int64     `json:"sinceseconds,omitempty" jsonschema:"bring logs newer than this duration"`
+	SinceTime     *time.Time `json:"sincetime,omitempty" jsonschema:"bring logs newer than this time"`
+	LimitBytes    *int64     `json:"limitbytes,omitempty" jsonschema:"do not bring more than N bytes (size cap)"`
+	Previous      bool       `json:"previous,omitempty" jsonschema:"bring logs from the previous instance of the container (useful after a crash/restart)"`
+	Follow        bool       `json:"follow,omitempty" jsonschema:"keep bringing new pages as they are being written (like kubectl logs -f)"`
+	Timestamps    bool       `json:"timestamps,omitempty" jsonschema:"include a timestamp at the start of each line"`
 }
 
 type LogsPod struct {
